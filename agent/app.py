@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, render_template_string, make_response
 import auth
-from agent import run_agent
+from chat_agent import run_agent
 
 PORT = int(os.environ["PORT"])
 
