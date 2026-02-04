@@ -1,0 +1,13 @@
+services:
+  llm:
+    build:
+      context: ./llm
+    container_name: lucos_comhra_llm
+    image: lucas42/lucos_comhra_llm
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_MODEL=qwen2.5:7b
+
+volumes:
+  ollama_data:
