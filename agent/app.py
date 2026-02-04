@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, render_template_string, make_response
 import auth
-#from agent import run_agent
+from agent import run_agent
 
 PORT = int(os.environ["PORT"])
 
@@ -34,8 +34,7 @@ def index():
 
 	if request.method == "POST":
 		prompt = request.form["prompt"]
-		#response = run_agent(prompt)
-		response = "You need to log in for access.  Unfortunately, login hasn't been implemented yet 🤷"
+		response = run_agent(prompt)
 
 	return auth.setAuthCookies(make_response(render_template_string(
 		HTML,
