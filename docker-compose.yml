@@ -9,5 +9,21 @@ services:
     environment:
       - OLLAMA_MODEL=qwen2.5:7b
 
+  agent:
+    build: ./agent
+    container_name: lucos_comhra_agent
+    image: lucas42/lucos_comhra_agent
+    environment:
+      - PORT
+      - SYSTEM
+      - ARACHNE_ENDPOINT
+      - KEY_LUCOS_ARACHNE
+      - OLLAMA_URL=http://llm:11434
+      - OLLAMA_MODEL=qwen2.5:7b
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - llm
+
 volumes:
   ollama_data:
