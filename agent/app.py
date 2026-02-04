@@ -1,5 +1,6 @@
 import os
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template_string, make_response
+import auth
 #from agent import run_agent
 
 PORT = int(os.environ["PORT"])
@@ -24,6 +25,10 @@ HTML = """
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+	try:
+		auth.checkAuth()
+	except auth.AuthException:
+		return auth.authenticate()
 	prompt = ""
 	response = None
 
@@ -32,11 +37,11 @@ def index():
 		#response = run_agent(prompt)
 		response = "You need to log in for access.  Unfortunately, login hasn't been implemented yet 🤷"
 
-	return render_template_string(
+	return auth.setAuthCookies(make_response(render_template_string(
 		HTML,
 		prompt=prompt,
 		response=response,
-	)
+	)))
 
 @app.route("/_info", methods=["GET"])
 def info():
