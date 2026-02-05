@@ -8,6 +8,12 @@ services:
       - ollama_data:/root/.ollama
     environment:
       - OLLAMA_MODEL=qwen2.5:7b
+    mem_limit: 4g
+    memswap_limit: 4g
+    cpus: "1.5"
+    blkio_config:
+      weight: 200
+    oom_score_adj: 500
 
   agent:
     build: ./agent
