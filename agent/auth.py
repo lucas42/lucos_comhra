@@ -1,4 +1,4 @@
-import requests, urllib
+import requests, urllib.parse
 from flask import request, redirect
 
 valid_tokens = [] # A cache of tokens which are known to be valid
