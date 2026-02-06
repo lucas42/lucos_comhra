@@ -5,22 +5,30 @@ from chat_agent import run_agent
 
 PORT = int(os.environ["PORT"])
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 
 HTML = """
 <!doctype html>
-<title>lucos_comhra</title>
-<h1>lucos_comhra</h1>
+<html>
+<head>
+	<title>lucOS Comhrá</title>
+</head>
+<body>
+	<lucos-navbar>lucOS Comhrá</lucos-navbar>
 
-<form method="post">
-	<textarea name="prompt" rows="8" cols="80">{{ prompt }}</textarea><br>
-	<button type="submit">Send</button>
-</form>
+	Start a chat:
+	<form method="post">
+		<textarea name="prompt" rows="8" cols="80">{{ prompt }}</textarea><br>
+		<button type="submit">Send</button>
+	</form>
 
-{% if response %}
-<h2>Response</h2>
-<pre>{{ response }}</pre>
-{% endif %}
+	{% if response %}
+	<h2>Response</h2>
+	<pre>{{ response }}</pre>
+	{% endif %}
+	<script src="/lucos_navbar.js" type="text/javascript"></script>
+</body>
+</html>
 """
 
 @app.route("/", methods=["GET", "POST"])
