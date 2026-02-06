@@ -1,5 +1,5 @@
 FROM lucas42/lucos_navbar:2.1.1 AS navbar
-FROM python:3.12-slim
+FROM python:3.14.2-alpine
 
 WORKDIR /app
 
