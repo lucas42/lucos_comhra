@@ -9,4 +9,4 @@ COPY *.py ./
 
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python", "app.py"]
+CMD gunicorn --bind 0.0.0.0:${PORT} app:app
