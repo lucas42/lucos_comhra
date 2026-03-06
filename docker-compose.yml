@@ -4,6 +4,7 @@ services:
       context: ./llm
     container_name: lucos_comhra_llm
     image: lucas42/lucos_comhra_llm
+    restart: always
     volumes:
       - ollama_data:/root/.ollama
     environment:
@@ -20,6 +21,7 @@ services:
     build: ./agent
     container_name: lucos_comhra_agent
     image: lucas42/lucos_comhra_agent
+    restart: always
     environment:
       - PORT
       - SYSTEM
