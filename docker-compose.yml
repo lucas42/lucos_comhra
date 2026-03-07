@@ -16,6 +16,12 @@ services:
     memswap_limit: 4g
     cpus: "1.5"
     oom_score_adj: 500
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
 
   agent:
     build: ./agent
@@ -33,6 +39,12 @@ services:
       - "${PORT}:${PORT}"
     depends_on:
       - llm
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:${PORT}/_info"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
 volumes:
   ollama_data:
