@@ -18,6 +18,7 @@ def extract_sparql(text):
 def run_sparql(query):
 	headers = {
 		"Accept": "application/sparql+json",
+		"User-Agent": os.environ.get("SYSTEM"),
 	}
 
 	r = requests.post(
