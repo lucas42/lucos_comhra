@@ -59,6 +59,7 @@ def run_agent(prompt):
 			fn = tool_call["function"]
 			tool_name = fn["name"]
 			tool_args = fn.get("arguments", {})
+			tool_id = tool_call.get("id", "")
 
 			try:
 				result = arachne.call_tool(tool_name, tool_args)
@@ -68,6 +69,7 @@ def run_agent(prompt):
 			messages.append({
 				"role": "tool",
 				"content": result,
+				"tool_call_id": tool_id,
 			})
 
 	# Final call without tools if we've hit the iteration limit
