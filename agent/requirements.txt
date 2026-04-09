@@ -1,3 +1,4 @@
 flask
 requests
 gunicorn
+mcp==1.27.0

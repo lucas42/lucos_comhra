@@ -1,55 +1,58 @@
 import os
-import re
+import asyncio
 import json
-import requests
+import httpx
+from mcp import ClientSession
+from mcp.client.streamable_http import streamable_http_client
 
 ARACHNE_ENDPOINT = os.environ["ARACHNE_ENDPOINT"].rstrip("/")
-ARACHNE_USER = os.environ["SYSTEM"]
 ARACHNE_KEY = os.environ["KEY_LUCOS_ARACHNE"]
+MCP_URL = f"{ARACHNE_ENDPOINT}/mcp"
 
-SPARQL_RE = re.compile(r"`sparql\s+(.*?)`", re.DOTALL)
 
-def extract_sparql(text):
-	match = SPARQL_RE.search(text)
-	if not match:
-		return None
-	return match.group(1).strip()
+async def _list_tools():
+	headers = {"Authorization": f"Bearer {ARACHNE_KEY}"}
+	async with httpx.AsyncClient(headers=headers) as http_client:
+		async with streamable_http_client(MCP_URL, http_client=http_client) as (read, write, _):
+			async with ClientSession(read, write) as session:
+				await session.initialize()
+				result = await session.list_tools()
+				return result.tools
 
-def run_sparql(query):
-	headers = {
-		"Accept": "application/sparql+json",
-		"User-Agent": os.environ.get("SYSTEM"),
-	}
 
-	r = requests.post(
-		f"{ARACHNE_ENDPOINT}/sparql",
-		data={"query": query},
-		headers=headers,
-		auth=(ARACHNE_USER, ARACHNE_KEY),
-		timeout=30,
-	)
-	r.raise_for_status()
-	return r.json()
+async def _call_tool(name, arguments):
+	headers = {"Authorization": f"Bearer {ARACHNE_KEY}"}
+	async with httpx.AsyncClient(headers=headers) as http_client:
+		async with streamable_http_client(MCP_URL, http_client=http_client) as (read, write, _):
+			async with ClientSession(read, write) as session:
+				await session.initialize()
+				result = await session.call_tool(name, arguments)
+				if result.content:
+					return result.content[0].text
+				return "(no result)"
 
-def create_result_message(results):
-	return {
-		"role": "system",
-		"content": (
-			"SPARQL results (JSON):\n"
-			f"{json.dumps(results, indent=2)}\n\n"
-			"Explain this to the user in clear natural language."
-		),
-	}
 
-def create_error_message(exception):
-	return {
-		"role": "system",
-		"content": (
-			"Error from sparql endpoint:\n"
-			f"{exception.response.text}\n\n"
-			"""Explain this error to the user in clear natural language.  
-			If the problem was due to the SPARQL query itself, then take responsibility for writing it wrong.  
-			Otherwise, take no reponsibility and suggest to the user what could be done to stop similar errors in future.
-			"""
-		),
-	}
+def get_tools():
+	"""Return available MCP tools in Ollama's tool format."""
+	tools = asyncio.run(_list_tools())
+	return [
+		{
+			"type": "function",
+			"function": {
+				"name": tool.name,
+				"description": tool.description or "",
+				"parameters": tool.inputSchema,
+			}
+		}
+		for tool in tools
+	]
+
+
+def call_tool(name, arguments):
+	"""Call a named MCP tool and return the result as a string."""
+	if isinstance(arguments, str):
+		try:
+			arguments = json.loads(arguments)
+		except json.JSONDecodeError:
+			arguments = {}
+	return asyncio.run(_call_tool(name, arguments))
