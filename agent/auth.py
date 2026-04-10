@@ -1,4 +1,4 @@
-import requests, urllib.parse
+import re, requests, urllib.parse
 from flask import request, redirect
 
 valid_tokens = [] # A cache of tokens which are known to be valid
@@ -25,9 +25,11 @@ def authenticate():
 	redirect_url = "{}://{}{}".format(request.headers.get('X-Forwarded-Proto', 'http'), request.headers.get('Host'), request.path)
 	return redirect("https://auth.l42.eu/authenticate?"+urllib.parse.urlencode({'redirect_uri': redirect_url}))
 
+SAFE_TOKEN_RE = re.compile(r'^[a-zA-Z0-9\-_]+\Z')
+
 def setAuthCookies(response):
 	token = request.args.get('token')
-	if token is not None and request.cookies.get('token') != token:
+	if token is not None and SAFE_TOKEN_RE.match(token) and request.cookies.get('token') != token:
 		if token in valid_tokens:
 			response.set_cookie('token', token)
 	return response
