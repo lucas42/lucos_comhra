@@ -25,7 +25,7 @@ def authenticate():
 	redirect_url = "{}://{}{}".format(request.headers.get('X-Forwarded-Proto', 'http'), request.headers.get('Host'), request.path)
 	return redirect("https://auth.l42.eu/authenticate?"+urllib.parse.urlencode({'redirect_uri': redirect_url}))
 
-SAFE_TOKEN_RE = re.compile(r'^[a-zA-Z0-9\-_]+$')
+SAFE_TOKEN_RE = re.compile(r'^[a-zA-Z0-9\-_]+\Z')
 
 def setAuthCookies(response):
 	token = request.args.get('token')

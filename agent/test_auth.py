@@ -75,3 +75,13 @@ class TestSetAuthCookies:
             response = make_response(app)
             result = auth.setAuthCookies(response)
         assert 'Set-Cookie' not in result.headers
+
+    def test_token_with_trailing_newline_rejected(self, app):
+        """A token with a trailing newline must be rejected — $ matches before \\n, \\Z does not."""
+        token = 'abc\n'
+        auth.valid_tokens.clear()
+        auth.valid_tokens.append(token)
+        with app.test_request_context('/?token=abc%0a'):
+            response = make_response(app)
+            result = auth.setAuthCookies(response)
+        assert 'Set-Cookie' not in result.headers
