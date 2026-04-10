@@ -26,6 +26,8 @@ def authenticate():
 	return redirect("https://auth.l42.eu/authenticate?"+urllib.parse.urlencode({'redirect_uri': redirect_url}))
 
 def setAuthCookies(response):
-	if request.args.get('token') is not None and request.cookies.get('token') != request.args.get('token'):
-		response.set_cookie('token', request.args.get('token'))
+	token = request.args.get('token')
+	if token is not None and request.cookies.get('token') != token:
+		if token in valid_tokens:
+			response.set_cookie('token', token)
 	return response
