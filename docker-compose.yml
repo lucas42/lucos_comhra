@@ -33,7 +33,9 @@ services:
       - SYSTEM
       - ARACHNE_ENDPOINT
       - KEY_LUCOS_ARACHNE
+      - OLLAMA_URL
       - OLLAMA_URL=http://llm:11434
+      - OLLAMA_MODEL
       - OLLAMA_MODEL=lucos-llama3.2-3b
     ports:
       - "${PORT}:${PORT}"
